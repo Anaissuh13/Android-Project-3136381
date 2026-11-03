@@ -1,57 +1,70 @@
 package ie.griffith.digitalatlas.ui.theme
 
-import android.app.Activity
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
+//the three options the user will pick from in settings
+enum class ThemeMode { LIGHT, DARK, SYSTEM }
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = TealPrimaryLight,
+    onPrimary = OnTealPrimaryLight,
+    primaryContainer = TealContainerLight,
+    onPrimaryContainer = OnTealContainerLight,
+    secondary = SandSecondaryLight,
+    onSecondary = OnSandSecondaryLight,
+    secondaryContainer = SandContainerLight,
+    onSecondaryContainer = OnSandContainerLight,
+    tertiary = CoralTertiaryLight,
+    onTertiary = OnCoralTertiaryLight,
+    background = BackgroundLight,
+    onBackground = OnBackgroundLight,
+    surface = BackgroundLight,
+    onSurface = OnBackgroundLight,
+    surfaceVariant = SurfaceVariantLight,
+    onSurfaceVariant = OnSurfaceVariantLight,
+    outline = OutlineLight
+)
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+private val DarkColorScheme = darkColorScheme(
+    primary = TealPrimaryDark,
+    onPrimary = OnTealPrimaryDark,
+    primaryContainer = TealContainerDark,
+    onPrimaryContainer = OnTealContainerDark,
+    secondary = SandSecondaryDark,
+    onSecondary = OnSandSecondaryDark,
+    secondaryContainer = SandContainerDark,
+    onSecondaryContainer = OnSandContainerDark,
+    tertiary = CoralTertiaryDark,
+    onTertiary = OnCoralTertiaryDark,
+    background = BackgroundDark,
+    onBackground = OnBackgroundDark,
+    surface = BackgroundDark,
+    onSurface = OnBackgroundDark,
+    surfaceVariant = SurfaceVariantDark,
+    onSurfaceVariant = OnSurfaceVariantDark,
+    outline = OutlineDark
 )
 
 @Composable
 fun DigitalAtlasTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    themeMode: ThemeMode = ThemeMode.SYSTEM,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+    //working out if dark mode should be on, system just follows the phone setting
+    val darkTheme = when (themeMode) {
+        ThemeMode.LIGHT -> false
+        ThemeMode.DARK -> true
+        ThemeMode.SYSTEM -> isSystemInDarkTheme()
     }
 
+    //removed dynamic colour from the template so the app keeps its own palette
+    //instead of taking colours from the user's wallpaper
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme,
         typography = Typography,
         content = content
     )
