@@ -25,4 +25,16 @@
     <string name="lookup_error_title">Couldn\'t reach the map service</string>
     <string name="lookup_error_message">Check your internet connection and try again.</string>
     <string name="retry">Retry</string>
+
+    <!--place details screen-->
+    <string name="back">Back</string>
+    <string name="tab_facts">Facts</string>
+    <string name="tab_to_visit">To visit</string>
+    <string name="tab_my_additions">My additions</string>
+    <string name="facts_placeholder_title">Facts are on the way</string>
+    <string name="facts_placeholder_message">A short summary from Wikipedia will appear here.</string>
+    <string name="to_visit_placeholder_title">Places to visit</string>
+    <string name="to_visit_placeholder_message">Notable spots near here will be listed in the next milestone.</string>
+    <string name="additions_placeholder_title">Nothing added yet</string>
+    <string name="additions_placeholder_message">You\'ll be able to add your own facts and tips in the next milestone.</string>
 </resources>

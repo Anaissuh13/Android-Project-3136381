@@ -9,6 +9,7 @@ import ie.griffith.digitalatlas.ui.main.MainScreen
 import ie.griffith.digitalatlas.ui.theme.DigitalAtlasTheme
 import org.osmdroid.config.Configuration
 import java.io.File
+import ie.griffith.digitalatlas.ui.detail.PlaceDetailActivity
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,8 +29,13 @@ class MainActivity : ComponentActivity() {
         setContent {
             DigitalAtlasTheme {
                 MainScreen(
+                    //showing a toast for now, this becomes an explicit intent to SettingsActivity in the next step
                     onSettingsClick = {
                         Toast.makeText(this, R.string.coming_soon, Toast.LENGTH_SHORT).show()
+                    },
+                    //explicit intent to the details screen, carrying the tapped place as extras
+                    onSeeDetails = { place ->
+                        startActivity(PlaceDetailActivity.newIntent(this, place))
                     }
                 )
             }

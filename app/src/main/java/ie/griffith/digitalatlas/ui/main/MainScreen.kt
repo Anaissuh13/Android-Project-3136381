@@ -31,6 +31,7 @@ import androidx.navigation.compose.rememberNavController
 import ie.griffith.digitalatlas.R
 import ie.griffith.digitalatlas.ui.map.MapScreen
 import ie.griffith.digitalatlas.ui.pinned.PinnedScreen
+import ie.griffith.digitalatlas.data.model.Place
 
 //keeping both tabs in one enum so the bottom bar and navhost read from the same list
 //filled icon when selected and outlined when not, so the current tab is obvious
@@ -46,7 +47,11 @@ enum class AtlasTab(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(onSettingsClick: () -> Unit) {
+fun MainScreen(
+    onSettingsClick: () -> Unit,
+    //passed up to MainActivity, which opens the details screen
+    onSeeDetails: (Place) -> Unit
+) {
     val navController = rememberNavController()
     //watching the back stack so the bottom bar knows which tab to highlight
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -106,7 +111,7 @@ fun MainScreen(onSettingsClick: () -> Unit) {
             startDestination = AtlasTab.MAP.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(AtlasTab.MAP.route) { MapScreen() }
+            composable(AtlasTab.MAP.route) { MapScreen(onSeeDetails = onSeeDetails) }
             composable(AtlasTab.PINNED.route) { PinnedScreen() }
         }
     }
