@@ -1,25 +1,25 @@
 package ie.griffith.digitalatlas
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import ie.griffith.digitalatlas.ui.main.MainScreen
 import ie.griffith.digitalatlas.ui.theme.DigitalAtlasTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //drawing behind the status and navigation bars, scaffold handles the padding
         enableEdgeToEdge()
         setContent {
             DigitalAtlasTheme {
-
+                MainScreen(
+                    onSettingsClick = {
+                        Toast.makeText(this, R.string.coming_soon, Toast.LENGTH_SHORT).show()
+                    }
+                )
             }
         }
     }

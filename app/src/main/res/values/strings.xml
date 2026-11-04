@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">Digital Atlas</string>
+
+    <!--bottom bar tabs-->
+    <string name="tab_map">Map</string>
+    <string name="tab_pinned">Pinned</string>
+
+    <!--top bar-->
+    <string name="settings">Settings</string>
+    <string name="coming_soon">Coming soon</string>
+
+    <!--pinned screen-->
+    <string name="pinned_empty_title">No pinned places yet</string>
+    <string name="pinned_empty_message">Tap a place on the map and pin it to save it here.</string>
 </resources>
