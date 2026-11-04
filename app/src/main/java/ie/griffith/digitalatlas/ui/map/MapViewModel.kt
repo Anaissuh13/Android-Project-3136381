@@ -75,11 +75,11 @@ class MapViewModel : ViewModel() {
         selectedPoint?.let { onMapTapped(it.latitude, it.longitude) }
     }
 
-    //used by the close button on the card, removes the pin too
+    //used by the close button on the card, removes the pin too.
+    //leaving lookupState as it is so the card doesn't go blank while it slides away
     fun clearSelection() {
         lookupJob?.cancel()
         selectedPoint = null
-        lookupState = PlaceLookupState.Idle
     }
 
     companion object {

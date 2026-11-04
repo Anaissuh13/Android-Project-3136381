@@ -12,4 +12,17 @@
     <!--pinned screen-->
     <string name="pinned_empty_title">No pinned places yet</string>
     <string name="pinned_empty_message">Tap a place on the map and pin it to save it here.</string>
+
+    <!--place preview card-->
+    <string name="close">Close</string>
+    <string name="finding_place">Finding this place…</string>
+    <string name="population">Population %1$s</string>
+    <string name="see_details">See details</string>
+    <string name="pin">Pin</string>
+    <string name="pin_coming_soon">Pinning places comes with the database in the next milestone</string>
+    <string name="nothing_here_title">Nothing to see here</string>
+    <string name="nothing_here_message">Looks like open water. Try tapping on land.</string>
+    <string name="lookup_error_title">Couldn\'t reach the map service</string>
+    <string name="lookup_error_message">Check your internet connection and try again.</string>
+    <string name="retry">Retry</string>
 </resources>

@@ -30,6 +30,17 @@ import org.osmdroid.views.overlay.CopyrightOverlay
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.TilesOverlay
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.Alignment
+import ie.griffith.digitalatlas.R
+import ie.griffith.digitalatlas.data.model.Place
 
 //starting position, centred on ireland
 private const val START_LAT = 53.4
@@ -39,6 +50,8 @@ private const val START_ZOOM = 6.5
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
+    //"see details" on the card, MainActivity will open PlaceDetailActivity from this in the next step
+    onSeeDetails: (Place) -> Unit = {},
     viewModel: MapViewModel = viewModel()
 ) {
     val context = LocalContext.current
@@ -145,25 +158,52 @@ fun MapScreen(
         }
     }
 
-    //wrapping osmdroid in AndroidView as it is a classic Android View, therefore sitting it inside Compose
-    AndroidView(
-        factory = { mapView },
-        modifier = modifier.fillMaxSize(),
-        //update runs again whenever the theme or the selected point changes
-        update = { map ->
-            //inverting the tiles in dark mode so the map isn't bright white
-            map.overlayManager.tilesOverlay.setColorFilter(
-                if (darkMap) TilesOverlay.INVERT_COLORS else null
-            )
-            //showing, moving or hiding the pin depending on what's selected
-            if (selectedPoint == null) {
-                map.overlays.remove(selectionMarker)
-            } else {
-                selectionMarker.position = selectedPoint
-                selectionMarker.icon = pinIcon
-                if (!map.overlays.contains(selectionMarker)) map.overlays.add(selectionMarker)
+    //box so the preview card can sit on top of the map
+    Box(modifier = modifier.fillMaxSize()) {
+        //wrapping osmdroid in AndroidView as it is a classic Android View, therefore sitting it inside Compose
+        AndroidView(
+            factory = { mapView },
+            modifier = Modifier.fillMaxSize(),
+            //update runs again whenever the theme or the selected point changes
+            update = { map ->
+                //inverting the tiles in dark mode so the map isn't bright white
+                map.overlayManager.tilesOverlay.setColorFilter(
+                    if (darkMap) TilesOverlay.INVERT_COLORS else null
+                )
+                //showing, moving or hiding the pin depending on what's selected
+                if (selectedPoint == null) {
+                    map.overlays.remove(selectionMarker)
+                } else {
+                    selectionMarker.position = selectedPoint
+                    selectionMarker.icon = pinIcon
+                    if (!map.overlays.contains(selectionMarker)) map.overlays.add(selectionMarker)
+                }
+                map.invalidate()
             }
-            map.invalidate()
+        )
+
+        //card slides up from the bottom when a place is selected and back down when it's closed
+        AnimatedVisibility(
+            visible = selectedPoint != null,
+            modifier = Modifier.align(Alignment.BottomCenter),
+            enter = slideInVertically { fullHeight -> fullHeight } + fadeIn(),
+            exit = slideOutVertically { fullHeight -> fullHeight } + fadeOut()
+        ) {
+            PlacePreviewCard(
+                state = viewModel.lookupState,
+                onSeeDetails = onSeeDetails,
+                //pinning needs the database (milestone 2), so just letting the user know for now
+                onPinClick = {
+                    Toast.makeText(context, R.string.pin_coming_soon, Toast.LENGTH_SHORT).show()
+                },
+                onRetry = viewModel::retry,
+                onClose = viewModel::clearSelection
+            )
         }
-    )
+    }
+
+    //back button closes the card first instead of leaving the app
+    BackHandler(enabled = selectedPoint != null) {
+        viewModel.clearSelection()
+    }
 }
