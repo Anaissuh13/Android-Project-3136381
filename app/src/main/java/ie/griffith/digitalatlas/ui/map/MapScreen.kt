@@ -52,8 +52,9 @@ fun MapScreen(modifier: Modifier = Modifier) {
             setMultiTouchControls(true)
             //scaling tiles to the screen density, otherwise on high dpi phones the map text is tiny
             isTilesScaledToDpi = true
-            //hiding the +/- buttons, pinch zoom feels more natural on a phone
-            zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
+            //showing +/- buttons only when the map is touched, then fading them out,
+            //so users who can't pinch easily can still zoom without the buttons cluttering the map
+            zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
             //stopping the world from repeating sideways and scrolling into empty grey space
             isHorizontalMapRepetitionEnabled = false
             isVerticalMapRepetitionEnabled = false
