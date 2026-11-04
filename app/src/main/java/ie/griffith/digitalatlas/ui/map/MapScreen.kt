@@ -11,11 +11,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
+import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.events.MapListener
 import org.osmdroid.events.ScrollEvent
 import org.osmdroid.events.ZoomEvent
@@ -24,15 +27,20 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.CopyrightOverlay
+import org.osmdroid.views.overlay.MapEventsOverlay
+import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.TilesOverlay
 
-//starting position, centred on ireland (need to change this to home country, maybe in milestone 2)
+//starting position, centred on ireland
 private const val START_LAT = 53.4
 private const val START_LON = -7.9
 private const val START_ZOOM = 6.5
 
 @Composable
-fun MapScreen(modifier: Modifier = Modifier) {
+fun MapScreen(
+    modifier: Modifier = Modifier,
+    viewModel: MapViewModel = viewModel()
+) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -44,6 +52,10 @@ fun MapScreen(modifier: Modifier = Modifier) {
     //checking the theme's background instead of the phone setting,
     //so this still works once the user can pick light/dark in settings
     val darkMap = MaterialTheme.colorScheme.background.luminance() < 0.5f
+    //coral from the theme for the pin so it stands out against the map
+    val pinColor = MaterialTheme.colorScheme.tertiary.toArgb()
+    //reading this here so the map gets updated whenever the selected point changes
+    val selectedPoint = viewModel.selectedPoint
 
     //creating the mapview once and remembering it, otherwise every recomposition would build a new map
     val mapView = remember {
@@ -82,7 +94,38 @@ fun MapScreen(modifier: Modifier = Modifier) {
                     return false
                 }
             })
+            //listening for taps, added at index 0 so it sits underneath everything else
+            //and the pin on top still gets its own taps first
+            overlays.add(0, MapEventsOverlay(object : MapEventsReceiver {
+                override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
+                    if (p == null) return false
+                    viewModel.onMapTapped(p.latitude, p.longitude)
+                    return true
+                }
+
+                //long press isn't used yet
+                override fun longPressHelper(p: GeoPoint?): Boolean = false
+            }))
         }
+    }
+
+    //one marker for the selected place, moved around instead of making a new one on every tap
+    val selectionMarker = remember(mapView) {
+        Marker(mapView).apply {
+            //anchoring at the bottom centre so the tip of the pin points at the exact spot
+            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            //the preview card shows the place info, so turning off osmdroid's default popup bubble
+            infoWindow = null
+            setOnMarkerClickListener { _, _ -> true }
+        }
+    }
+    //only rebuilding the pin when the theme colour changes
+    val pinIcon = remember(pinColor) {
+        AtlasPinDrawable(
+            fillColor = pinColor,
+            dotColor = android.graphics.Color.WHITE,
+            density = context.resources.displayMetrics.density
+        )
     }
 
     //pausing and resuming the map with the activity so it stops loading tiles in the background
@@ -106,11 +149,20 @@ fun MapScreen(modifier: Modifier = Modifier) {
     AndroidView(
         factory = { mapView },
         modifier = modifier.fillMaxSize(),
-        //update runs again when the theme changes, inverting the tiles so the map isn't bright white in dark mode
+        //update runs again whenever the theme or the selected point changes
         update = { map ->
+            //inverting the tiles in dark mode so the map isn't bright white
             map.overlayManager.tilesOverlay.setColorFilter(
                 if (darkMap) TilesOverlay.INVERT_COLORS else null
             )
+            //showing, moving or hiding the pin depending on what's selected
+            if (selectedPoint == null) {
+                map.overlays.remove(selectionMarker)
+            } else {
+                selectionMarker.position = selectedPoint
+                selectionMarker.icon = pinIcon
+                if (!map.overlays.contains(selectionMarker)) map.overlays.add(selectionMarker)
+            }
             map.invalidate()
         }
     )
