@@ -37,4 +37,24 @@
     <string name="to_visit_placeholder_message">Notable spots near here will be listed in the next milestone.</string>
     <string name="additions_placeholder_title">Nothing added yet</string>
     <string name="additions_placeholder_message">You\'ll be able to add your own facts and tips in the next milestone.</string>
+
+    <!--settings screen-->
+    <string name="appearance">Appearance</string>
+    <string name="theme">Theme</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_system">System</string>
+    <string name="sensors_section">Sensors &amp; location</string>
+    <string name="shake_to_discover">Shake to discover</string>
+    <string name="shake_to_discover_desc">Shake your phone to jump to a random place</string>
+    <string name="use_location">Use my location</string>
+    <string name="use_location_desc">Centre the map on where you are</string>
+    <string name="coming_next_milestone">Coming in the next milestone</string>
+    <string name="about_section">About &amp; data sources</string>
+    <string name="source_osm_title">Map data</string>
+    <string name="source_osm_desc">© OpenStreetMap contributors, available under the Open Database Licence</string>
+    <string name="source_nominatim_title">Place lookup</string>
+    <string name="source_nominatim_desc">Nominatim, OpenStreetMap\'s geocoding service</string>
+    <string name="source_wikipedia_title">Facts</string>
+    <string name="source_wikipedia_desc">Wikipedia, available under CC BY-SA</string>
 </resources>

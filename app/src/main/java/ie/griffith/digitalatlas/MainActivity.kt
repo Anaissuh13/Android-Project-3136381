@@ -1,7 +1,6 @@
 package ie.griffith.digitalatlas
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -10,6 +9,8 @@ import ie.griffith.digitalatlas.ui.theme.DigitalAtlasTheme
 import org.osmdroid.config.Configuration
 import java.io.File
 import ie.griffith.digitalatlas.ui.detail.PlaceDetailActivity
+import android.content.Intent
+import ie.griffith.digitalatlas.ui.settings.SettingsActivity
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,8 +31,9 @@ class MainActivity : ComponentActivity() {
             DigitalAtlasTheme {
                 MainScreen(
                     //showing a toast for now, this becomes an explicit intent to SettingsActivity in the next step
+                    //explicit intent to SettingsActivity, no extras needed
                     onSettingsClick = {
-                        Toast.makeText(this, R.string.coming_soon, Toast.LENGTH_SHORT).show()
+                        startActivity(Intent(this, SettingsActivity::class.java))
                     },
                     //explicit intent to the details screen, carrying the tapped place as extras
                     onSeeDetails = { place ->
