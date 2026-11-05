@@ -5,6 +5,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import android.app.Activity
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 
 //the three options the user will pick from in settings
 enum class ThemeMode { LIGHT, DARK, SYSTEM }
@@ -60,6 +64,19 @@ fun DigitalAtlasTheme(
         ThemeMode.DARK -> true
         ThemeMode.SYSTEM -> isSystemInDarkTheme()
     }
+
+    //making the status bar and navigation bar icons dark on light mode and light on dark mode,
+    //otherwise picking light mode while the phone is in dark mode leaves white icons on a white bar
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            val insetsController = WindowCompat.getInsetsController(window, view)
+            insetsController.isAppearanceLightStatusBars = !darkTheme
+            insetsController.isAppearanceLightNavigationBars = !darkTheme
+        }
+    }
+
 
     //removed dynamic colour from the template so the app keeps its own palette
     //instead of taking colours from the user's wallpaper

@@ -7,7 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import ie.griffith.digitalatlas.data.model.Place
-import ie.griffith.digitalatlas.ui.theme.DigitalAtlasTheme
+import ie.griffith.digitalatlas.ui.theme.DigitalAtlasAppTheme
 
 //second activity, opened from the "see details" button on the map's preview card
 class PlaceDetailActivity : ComponentActivity() {
@@ -28,7 +28,7 @@ class PlaceDetailActivity : ComponentActivity() {
         val longitude = intent.getDoubleExtra(EXTRA_LON, 0.0)
 
         setContent {
-            DigitalAtlasTheme {
+            DigitalAtlasAppTheme {
                 PlaceDetailScreen(
                     name = name,
                     subtitle = subtitle,

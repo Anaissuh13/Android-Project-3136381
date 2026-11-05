@@ -5,12 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import ie.griffith.digitalatlas.ui.main.MainScreen
-import ie.griffith.digitalatlas.ui.theme.DigitalAtlasTheme
 import org.osmdroid.config.Configuration
 import java.io.File
 import ie.griffith.digitalatlas.ui.detail.PlaceDetailActivity
 import android.content.Intent
 import ie.griffith.digitalatlas.ui.settings.SettingsActivity
+import ie.griffith.digitalatlas.ui.theme.DigitalAtlasAppTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,9 +28,8 @@ class MainActivity : ComponentActivity() {
         osmConfig.osmdroidTileCache = File(osmConfig.osmdroidBasePath, "tiles")
 
         setContent {
-            DigitalAtlasTheme {
+            DigitalAtlasAppTheme {
                 MainScreen(
-                    //showing a toast for now, this becomes an explicit intent to SettingsActivity in the next step
                     //explicit intent to SettingsActivity, no extras needed
                     onSettingsClick = {
                         startActivity(Intent(this, SettingsActivity::class.java))
