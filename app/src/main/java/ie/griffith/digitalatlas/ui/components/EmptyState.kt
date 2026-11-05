@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.material3.OutlinedButton
 
 //reusable empty state so every empty screen looks the same,
 //will be used again for my additions and search with no results
@@ -24,7 +25,10 @@ fun EmptyState(
     icon: ImageVector,
     title: String,
     message: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    //optional button, e.g. retry, only shown when a label is given
+    actionLabel: String? = null,
+    onAction: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
@@ -53,5 +57,11 @@ fun EmptyState(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
+        if (actionLabel != null) {
+            Spacer(modifier = Modifier.height(16.dp))
+            OutlinedButton(onClick = onAction) {
+                Text(text = actionLabel)
+            }
+        }
     }
 }

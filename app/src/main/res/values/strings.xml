@@ -31,8 +31,6 @@
     <string name="tab_facts">Facts</string>
     <string name="tab_to_visit">To visit</string>
     <string name="tab_my_additions">My additions</string>
-    <string name="facts_placeholder_title">Facts are on the way</string>
-    <string name="facts_placeholder_message">A short summary from Wikipedia will appear here.</string>
     <string name="to_visit_placeholder_title">Places to visit</string>
     <string name="to_visit_placeholder_message">Notable spots near here will be listed in the next milestone.</string>
     <string name="additions_placeholder_title">Nothing added yet</string>
@@ -57,4 +55,12 @@
     <string name="source_nominatim_desc">Nominatim, OpenStreetMap\'s geocoding service</string>
     <string name="source_wikipedia_title">Facts</string>
     <string name="source_wikipedia_desc">Wikipedia, available under CC BY-SA</string>
+
+    <!--facts tab-->
+    <string name="facts_not_found_title">No Wikipedia article yet</string>
+    <string name="facts_not_found_message">Smaller places often don\'t have one. You\'ll be able to add your own facts in the next milestone.</string>
+    <string name="facts_error_title">Couldn\'t load facts</string>
+    <string name="facts_error_message">Check your internet connection and try again.</string>
+    <string name="from_wikipedia">From Wikipedia, the free encyclopedia</string>
+    <string name="place_photo">Photo of %1$s</string>
 </resources>

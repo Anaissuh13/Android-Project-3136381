@@ -13,7 +13,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.outlined.Attractions
 import androidx.compose.material.icons.outlined.EditNote
 import androidx.compose.material.icons.outlined.Place
@@ -39,6 +38,8 @@ import ie.griffith.digitalatlas.ui.components.EmptyState
 import kotlinx.coroutines.launch
 import java.util.Locale
 import kotlin.math.abs
+import androidx.compose.runtime.LaunchedEffect
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 //the three tabs from the proposal
 private enum class DetailTab(@StringRes val labelRes: Int) {
@@ -54,8 +55,16 @@ fun PlaceDetailScreen(
     subtitle: String,
     latitude: Double,
     longitude: Double,
-    onBack: () -> Unit
+    //article name from openstreetmap, null if it didn't link one
+    wikiTitle: String?,
+    onBack: () -> Unit,
+    viewModel: PlaceDetailViewModel = viewModel()
 ) {
+    //loading the facts once when the screen opens, falling back to the place name if osm had no article
+    LaunchedEffect(Unit) {
+        viewModel.loadFacts(wikiTitle ?: name)
+    }
+
     val tabs = DetailTab.entries
     //pager state is shared by the tab row and the pager so swiping and tapping stay in sync
     val pagerState = rememberPagerState(pageCount = { tabs.size })
@@ -127,10 +136,9 @@ fun PlaceDetailScreen(
                     .weight(1f)
             ) { page ->
                 when (tabs[page]) {
-                    DetailTab.FACTS -> EmptyState(
-                        icon = Icons.AutoMirrored.Outlined.MenuBook,
-                        title = stringResource(R.string.facts_placeholder_title),
-                        message = stringResource(R.string.facts_placeholder_message)
+                    DetailTab.FACTS -> FactsTab(
+                        state = viewModel.factsState,
+                        onRetry = viewModel::retry
                     )
                     DetailTab.TO_VISIT -> EmptyState(
                         icon = Icons.Outlined.Attractions,

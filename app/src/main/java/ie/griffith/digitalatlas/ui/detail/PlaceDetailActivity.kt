@@ -26,6 +26,8 @@ class PlaceDetailActivity : ComponentActivity() {
         val subtitle = intent.getStringExtra(EXTRA_SUBTITLE).orEmpty()
         val latitude = intent.getDoubleExtra(EXTRA_LAT, 0.0)
         val longitude = intent.getDoubleExtra(EXTRA_LON, 0.0)
+        //null when openstreetmap didn't link a wikipedia article
+        val wikiTitle = intent.getStringExtra(EXTRA_WIKI_TITLE)
 
         setContent {
             DigitalAtlasAppTheme {
@@ -34,6 +36,7 @@ class PlaceDetailActivity : ComponentActivity() {
                     subtitle = subtitle,
                     latitude = latitude,
                     longitude = longitude,
+                    wikiTitle = wikiTitle,
                     //finish() closes this activity and goes back to the map
                     onBack = { finish() }
                 )
@@ -47,7 +50,7 @@ class PlaceDetailActivity : ComponentActivity() {
         private const val EXTRA_SUBTITLE = "ie.griffith.digitalatlas.extra.SUBTITLE"
         private const val EXTRA_LAT = "ie.griffith.digitalatlas.extra.LAT"
         private const val EXTRA_LON = "ie.griffith.digitalatlas.extra.LON"
-        //sent now but only read tomorrow when the facts tab loads from wikipedia
+        //used by the facts tab to load the right wikipedia article
         private const val EXTRA_WIKI_TITLE = "ie.griffith.digitalatlas.extra.WIKI_TITLE"
 
         //explicit intent, naming PlaceDetailActivity directly as the screen to open,
