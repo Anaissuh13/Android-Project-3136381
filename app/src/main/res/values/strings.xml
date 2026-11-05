@@ -63,4 +63,11 @@
     <string name="facts_error_message">Check your internet connection and try again.</string>
     <string name="from_wikipedia">From Wikipedia, the free encyclopedia</string>
     <string name="place_photo">Photo of %1$s</string>
+
+    <!--implicit intents-->
+    <string name="share_place">Share place</string>
+    <string name="share_text">%1$s\n%2$s\n\nShared from Digital Atlas</string>
+    <string name="open_in_maps">Open in Maps</string>
+    <string name="read_full_article">Read the full article</string>
+    <string name="no_app_found">No app found to open this</string>
 </resources>

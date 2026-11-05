@@ -8,6 +8,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import ie.griffith.digitalatlas.data.model.Place
 import ie.griffith.digitalatlas.ui.theme.DigitalAtlasAppTheme
+import android.content.ActivityNotFoundException
+import android.widget.Toast
+import androidx.core.net.toUri
+import ie.griffith.digitalatlas.R
 
 //second activity, opened from the "see details" button on the map's preview card
 class PlaceDetailActivity : ComponentActivity() {
@@ -37,12 +41,53 @@ class PlaceDetailActivity : ComponentActivity() {
                     latitude = latitude,
                     longitude = longitude,
                     wikiTitle = wikiTitle,
+                    onShare = { sharePlace(name, subtitle, latitude, longitude) },
+                    onOpenInMaps = { openInMaps(name, latitude, longitude) },
+                    onOpenWikipedia = { url -> openUrl(url) },
                     //finish() closes this activity and goes back to the map
                     onBack = { finish() }
                 )
             }
         }
     }
+
+    //implicit intent: asking android for any app that can share plain text (messages, email, whatsapp...)
+    private fun sharePlace(name: String, subtitle: String, lat: Double, lon: Double) {
+        val heading = if (subtitle.isBlank()) name else "$name, $subtitle"
+        val text = getString(R.string.share_text, heading, osmLink(lat, lon))
+        val sendIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_SUBJECT, name)
+            putExtra(Intent.EXTRA_TEXT, text)
+        }
+        //createChooser always shows the share sheet, instead of jumping straight into a remembered default app
+        startActivity(Intent.createChooser(sendIntent, getString(R.string.share_place)))
+    }
+
+    //implicit intent with a geo: link, opens whichever maps app the user has, e.g. for directions
+    private fun openInMaps(name: String, lat: Double, lon: Double) {
+        //q= drops a labelled pin, Uri.encode deals with spaces and accents in the name
+        val geoUri = "geo:$lat,$lon?q=$lat,$lon(${android.net.Uri.encode(name)})".toUri()
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, geoUri))
+        } catch (e: ActivityNotFoundException) {
+            //no maps app on the phone, so showing the place on openstreetmap.org in the browser instead
+            openUrl(osmLink(lat, lon))
+        }
+    }
+
+    //implicit intent to open a web link, android picks the browser (or the wikipedia app if installed)
+    private fun openUrl(url: String) {
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(this, R.string.no_app_found, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    //link to the place on openstreetmap's website, used for sharing and as the maps fallback
+    private fun osmLink(lat: Double, lon: Double) =
+        "https://www.openstreetmap.org/?mlat=$lat&mlon=$lon#map=13/$lat/$lon"
 
     companion object {
         //keys for the intent extras, kept as constants so the sender and receiver can't spell them differently

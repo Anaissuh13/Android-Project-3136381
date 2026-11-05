@@ -40,6 +40,10 @@ import java.util.Locale
 import kotlin.math.abs
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.material.icons.outlined.Directions
+import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.foundation.layout.height
 
 //the three tabs from the proposal
 private enum class DetailTab(@StringRes val labelRes: Int) {
@@ -58,6 +62,10 @@ fun PlaceDetailScreen(
     //article name from openstreetmap, null if it didn't link one
     wikiTitle: String?,
     onBack: () -> Unit,
+    //these three are implicit intents, handled by PlaceDetailActivity
+    onShare: () -> Unit,
+    onOpenInMaps: () -> Unit,
+    onOpenWikipedia: (String) -> Unit,
     viewModel: PlaceDetailViewModel = viewModel()
 ) {
     //loading the facts once when the screen opens, falling back to the place name if osm had no article
@@ -83,6 +91,14 @@ fun PlaceDetailScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back)
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onShare) {
+                        Icon(
+                            imageVector = Icons.Outlined.Share,
+                            contentDescription = stringResource(R.string.share_place)
                         )
                     }
                 },
@@ -116,6 +132,17 @@ fun PlaceDetailScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+                Spacer(modifier = Modifier.height(8.dp))
+                //tonal button so it stands out without being as loud as a full button
+                FilledTonalButton(onClick = onOpenInMaps) {
+                    Icon(
+                        imageVector = Icons.Outlined.Directions,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(text = stringResource(R.string.open_in_maps))
+                }
             }
 
             PrimaryTabRow(selectedTabIndex = pagerState.currentPage) {
@@ -138,7 +165,8 @@ fun PlaceDetailScreen(
                 when (tabs[page]) {
                     DetailTab.FACTS -> FactsTab(
                         state = viewModel.factsState,
-                        onRetry = viewModel::retry
+                        onRetry = viewModel::retry,
+                        onOpenWikipedia = onOpenWikipedia
                     )
                     DetailTab.TO_VISIT -> EmptyState(
                         icon = Icons.Outlined.Attractions,

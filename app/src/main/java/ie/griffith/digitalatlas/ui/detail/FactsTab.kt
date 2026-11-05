@@ -30,14 +30,23 @@ import ie.griffith.digitalatlas.R
 import ie.griffith.digitalatlas.data.model.WikiSummary
 import ie.griffith.digitalatlas.network.AtlasImageLoader
 import ie.griffith.digitalatlas.ui.components.EmptyState
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.automirrored.outlined.OpenInNew
+import androidx.compose.material3.Icon
+import androidx.compose.material3.TextButton
 
 @Composable
-fun FactsTab(state: FactsState, onRetry: () -> Unit) {
+fun FactsTab(
+    state: FactsState,
+    onRetry: () -> Unit,
+    onOpenWikipedia: (String) -> Unit
+) {
     when (state) {
         FactsState.Loading -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
         }
-        is FactsState.Loaded -> FactsContent(state.summary)
+        is FactsState.Loaded -> FactsContent(state.summary, onOpenWikipedia)
         FactsState.NotFound -> EmptyState(
             icon = Icons.AutoMirrored.Outlined.MenuBook,
             title = stringResource(R.string.facts_not_found_title),
@@ -54,7 +63,7 @@ fun FactsTab(state: FactsState, onRetry: () -> Unit) {
 }
 
 @Composable
-private fun FactsContent(summary: WikiSummary) {
+private fun FactsContent(summary: WikiSummary, onOpenWikipedia: (String) -> Unit) {
     val context = LocalContext.current
     //scrollable since some summaries are a few paragraphs long
     Column(
@@ -89,6 +98,18 @@ private fun FactsContent(summary: WikiSummary) {
             Spacer(modifier = Modifier.height(8.dp))
         }
         Text(text = summary.extract, style = MaterialTheme.typography.bodyLarge)
+
+        //the summary is only the first paragraph, this opens the whole article outside the app
+        TextButton(onClick = { onOpenWikipedia(summary.pageUrl) }) {
+            Text(text = stringResource(R.string.read_full_article))
+            Spacer(modifier = Modifier.width(6.dp))
+            Icon(
+                imageVector = Icons.AutoMirrored.Outlined.OpenInNew,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp)
+            )
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
         //wikipedia's licence asks for attribution
         Text(
