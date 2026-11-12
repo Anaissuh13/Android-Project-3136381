@@ -14,6 +14,7 @@ import androidx.core.net.toUri
 import ie.griffith.digitalatlas.R
 
 //second activity, opened from the "see details" button on the map's preview card
+//handles the implicit intents
 class PlaceDetailActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

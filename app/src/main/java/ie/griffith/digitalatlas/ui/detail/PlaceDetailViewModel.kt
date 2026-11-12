@@ -11,6 +11,7 @@ import ie.griffith.digitalatlas.network.WikipediaClient
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
+//Loads the wikipedia facts, survives rotation
 //what the facts tab can be showing
 sealed interface FactsState {
     data object Loading : FactsState

@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.OutlinedButton
 
+//Reusable composable, used 5 times (Pinned, 2 detail tabs, facts not found, facts error)
 //reusable empty state so every empty screen looks the same,
 //will be used again for my additions and search with no results
 @Composable

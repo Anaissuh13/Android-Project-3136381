@@ -7,6 +7,7 @@ import org.json.JSONObject
 import java.net.URLEncoder
 
 //gets the short summary of a wikipedia article using wikipedia's free REST api
+//Also helps separate "no article" (normal) from "no internet" (an error)
 object WikipediaClient {
 
     private const val SUMMARY_URL = "https://en.wikipedia.org/api/rest_v1/page/summary/"

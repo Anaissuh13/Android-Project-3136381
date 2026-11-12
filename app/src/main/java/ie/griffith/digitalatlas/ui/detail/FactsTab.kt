@@ -36,6 +36,7 @@ import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material3.Icon
 import androidx.compose.material3.TextButton
 
+//shows the facts states, the photo, and the "Read full article"
 @Composable
 fun FactsTab(
     state: FactsState,

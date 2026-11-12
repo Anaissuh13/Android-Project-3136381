@@ -5,7 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
-//talks to nominatim (openstreetmap's geocoder) to find out what place is at a point on the map
+//talks to nominatim (openstreetmap's geocoder) to find out what place is at a point on the map using its latitude and longitude. Reverse geocoding
 object NominatimClient {
 
     private const val BASE_URL = "https://nominatim.openstreetmap.org"

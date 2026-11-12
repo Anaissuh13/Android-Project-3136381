@@ -45,6 +45,7 @@ import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.foundation.layout.height
 
+//Header, "Open in Maps", the 3 tabs with
 //the three tabs from the proposal
 private enum class DetailTab(@StringRes val labelRes: Int) {
     FACTS(R.string.tab_facts),
