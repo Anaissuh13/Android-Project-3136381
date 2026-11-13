@@ -29,7 +29,6 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.CopyrightOverlay
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
-import org.osmdroid.views.overlay.TilesOverlay
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -41,11 +40,29 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Alignment
 import ie.griffith.digitalatlas.R
 import ie.griffith.digitalatlas.data.model.Place
+import android.graphics.ColorMatrixColorFilter
+import org.osmdroid.views.CustomZoomButtonsDisplay
+import org.osmdroid.views.overlay.TilesOverlay
 
 //starting position, centred on ireland
 private const val START_LAT = 53.4
 private const val START_LON = -7.9
 private const val START_ZOOM = 6.5
+
+//Milestone 1 feedback correction
+//dark mode filter for the map tiles. inverting on its own turned the sea brown and the land purple,
+//so the colours are inverted and then rotated 180 degrees round the colour wheel, which brings
+//the real colours back (blue sea, green parks) but dark. everything is then dimmed to 80%
+//and a dark slate base is added so it matches the app's dark theme.
+//each row works out one colour channel: red, green, blue, alpha (last number = amount added)
+private val DarkMapFilter = ColorMatrixColorFilter(
+    floatArrayOf(
+        0.4592f, -1.1440f, -0.1152f, 0f, 226f,
+        -0.3408f, -0.3440f, -0.1152f, 0f, 234f,
+        -0.3408f, -1.1440f, 0.6848f, 0f, 240f,
+        0f, 0f, 0f, 1f, 0f
+    )
+)
 
 @Composable
 fun MapScreen(
@@ -80,6 +97,15 @@ fun MapScreen(
             //showing +/- buttons only when the map is touched, then fading them out,
             //so users who can't pinch easily can still zoom without the buttons cluttering the map
             zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
+
+            //stacking the +/- buttons on the left edge in the middle of the screen,
+            //so the preview card at the bottom never covers them and the user can zoom while it's open
+            zoomController.display.setPositions(
+                false,
+                CustomZoomButtonsDisplay.HorizontalPosition.LEFT,
+                CustomZoomButtonsDisplay.VerticalPosition.CENTER
+            )
+
             //stopping the world from repeating sideways and scrolling into empty grey space
             isHorizontalMapRepetitionEnabled = false
             isVerticalMapRepetitionEnabled = false
@@ -166,9 +192,9 @@ fun MapScreen(
             modifier = Modifier.fillMaxSize(),
             //update runs again whenever the theme or the selected point changes
             update = { map ->
-                //inverting the tiles in dark mode so the map isn't bright white
+                //darkening the tiles in dark mode so the map isn't bright white
                 map.overlayManager.tilesOverlay.setColorFilter(
-                    if (darkMap) TilesOverlay.INVERT_COLORS else null
+                    if (darkMap) DarkMapFilter else null
                 )
                 //showing, moving or hiding the pin depending on what's selected
                 if (selectedPoint == null) {
