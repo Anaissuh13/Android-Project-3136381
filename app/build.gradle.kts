@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -52,6 +53,10 @@ dependencies {
     implementation(libs.osmdroid.android)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.coil.compose)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    //ksp instead of implementation, the compiler only runs while building and isn't put in the app
+    ksp(libs.androidx.room.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
