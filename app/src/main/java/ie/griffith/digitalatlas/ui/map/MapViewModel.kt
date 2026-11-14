@@ -51,6 +51,11 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
     var lookupState by mutableStateOf<PlaceLookupState>(PlaceLookupState.Idle)
         private set
 
+    //set when the map should animate to a place, e.g. after tapping a pin in the pinned list.
+    //the map screen starts the animation and then clears it with onFlyToHandled()
+    var flyToTarget by mutableStateOf<GeoPoint?>(null)
+        private set
+
     private var lookupJob: Job? = null
     private var lastRequestTime = 0L
 
@@ -93,6 +98,19 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
         lookupJob?.cancel()
         selectedPoint = GeoPoint(pin.latitude, pin.longitude)
         lookupState = PlaceLookupState.Found(pin.toPlace())
+    }
+
+    //called from the pinned list, selects the pin and asks the map to fly to it
+    fun focusOn(pin: PinnedPlace) {
+        lookupJob?.cancel()
+        selectedPoint = GeoPoint(pin.latitude, pin.longitude)
+        lookupState = PlaceLookupState.Found(pin.toPlace())
+        flyToTarget = GeoPoint(pin.latitude, pin.longitude)
+    }
+
+    //the map screen calls this once it has started the animation, so it doesn't fly there again
+    fun onFlyToHandled() {
+        flyToTarget = null
     }
 
     //the card's pin button, saves the place or removes it if it's already pinned

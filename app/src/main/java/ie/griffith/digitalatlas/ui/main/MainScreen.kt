@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -32,6 +33,8 @@ import ie.griffith.digitalatlas.R
 import ie.griffith.digitalatlas.ui.map.MapScreen
 import ie.griffith.digitalatlas.ui.pinned.PinnedScreen
 import ie.griffith.digitalatlas.data.model.Place
+import ie.griffith.digitalatlas.ui.map.MapViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 //keeping both tabs in one enum so the bottom bar and navhost read from the same list
 //filled icon when selected and outlined when not, so the current tab is obvious
@@ -57,6 +60,22 @@ fun MainScreen(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
 
+    //created here instead of inside the map tab so the pinned tab can reach it too.
+    //viewModel() out here belongs to the activity, so it lives as long as MainActivity does
+    val mapViewModel: MapViewModel = viewModel()
+
+    //switching tabs: going back to the start tab instead of piling up copies of screens,
+    //and saving/restoring state so each tab remembers where it was
+    fun openTab(tab: AtlasTab) {
+        navController.navigate(tab.route) {
+            popUpTo(navController.graph.findStartDestination().id) {
+                saveState = true
+            }
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -81,17 +100,7 @@ fun MainScreen(
                     val selected = currentRoute == tab.route
                     NavigationBarItem(
                         selected = selected,
-                        onClick = {
-                            navController.navigate(tab.route) {
-                                //going back to the start tab instead of piling up copies of screens,
-                                //and saving/restoring state so each tab remembers where it was
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
+                        onClick = { openTab(tab) },
                         //label is already shown under the icon so the icon doesn't need its own description
                         icon = {
                             Icon(
@@ -111,8 +120,18 @@ fun MainScreen(
             startDestination = AtlasTab.MAP.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(AtlasTab.MAP.route) { MapScreen(onSeeDetails = onSeeDetails) }
-            composable(AtlasTab.PINNED.route) { PinnedScreen() }
+            composable(AtlasTab.MAP.route) {
+                MapScreen(onSeeDetails = onSeeDetails, viewModel = mapViewModel)
+            }
+            composable(AtlasTab.PINNED.route) {
+                PinnedScreen(
+                    //selecting the pin on the map first, then switching tabs so the map flies to it
+                    onPinClick = { pin ->
+                        mapViewModel.focusOn(pin)
+                        openTab(AtlasTab.MAP)
+                    }
+                )
+            }
         }
     }
 }

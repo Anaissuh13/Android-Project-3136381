@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.remember
@@ -47,6 +48,10 @@ import ie.griffith.digitalatlas.ui.theme.CoralTertiaryLight
 private const val START_LAT = 53.4
 private const val START_LON = -7.9
 private const val START_ZOOM = 6.5
+
+//how close and how fast the map zooms in when flying to a pinned place
+private const val FLY_TO_ZOOM = 12.0
+private const val FLY_TO_SPEED_MS = 1_200L
 
 //Milestone 1 feedback correction
 //dark mode filter for the map tiles. inverting on its own turned the sea brown and the land purple,
@@ -194,6 +199,16 @@ fun MapScreen(
             lifecycleOwner.lifecycle.removeObserver(observer)
             //freeing the map's tile threads and memory when leaving the map tab
             mapView.onDetach()
+        }
+    }
+
+    //flying to a place when asked, e.g. after tapping a pin in the pinned list.
+    //post{} waits until the map has been laid out, since it was only just created when the tab opened
+    val flyToTarget = viewModel.flyToTarget
+    LaunchedEffect(flyToTarget) {
+        if (flyToTarget != null) {
+            mapView.post { mapView.controller.animateTo(flyToTarget, FLY_TO_ZOOM, FLY_TO_SPEED_MS) }
+            viewModel.onFlyToHandled()
         }
     }
 

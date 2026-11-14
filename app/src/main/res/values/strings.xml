@@ -70,4 +70,22 @@
     <string name="open_in_maps">Open in Maps</string>
     <string name="read_full_article">Read the full article</string>
     <string name="no_app_found">No app found to open this</string>
+
+
+    <!--pinned places list-->
+    <string name="status_want_to_visit">Want to visit</string>
+    <string name="status_visiting">Visiting</string>
+    <string name="pinned_on">Pinned %1$s</string>
+    <string name="edit_pin_cd">Edit %1$s</string>
+    <string name="remove_pin_cd">Remove %1$s</string>
+    <string name="edit_pin_title">Edit %1$s</string>
+    <string name="status_label">Status</string>
+    <string name="note_label">Note</string>
+    <string name="note_hint">e.g. Go in summer, try the market</string>
+    <string name="note_counter">%1$d/%2$d</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="remove">Remove</string>
+    <string name="remove_pin_title">Remove %1$s?</string>
+    <string name="remove_pin_message">It will be taken off your pinned places and the map, along with its note.</string>
 </resources>
