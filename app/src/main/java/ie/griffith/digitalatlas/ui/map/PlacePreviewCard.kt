@@ -36,8 +36,6 @@ import androidx.compose.ui.unit.dp
 import ie.griffith.digitalatlas.R
 import ie.griffith.digitalatlas.data.model.Place
 import java.text.NumberFormat
-import androidx.compose.material.icons.filled.PushPin
-import androidx.compose.material3.FilledTonalButton
 
 //the card that slides up from the bottom of the map after tapping somewhere,
 //one composable handles every lookup state so the card stays in the same spot

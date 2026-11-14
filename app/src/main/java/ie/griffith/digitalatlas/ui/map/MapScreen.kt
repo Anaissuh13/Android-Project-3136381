@@ -37,12 +37,11 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Alignment
-import ie.griffith.digitalatlas.R
 import ie.griffith.digitalatlas.data.model.Place
 import android.graphics.ColorMatrixColorFilter
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.osmdroid.views.CustomZoomButtonsDisplay
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ie.griffith.digitalatlas.ui.theme.CoralTertiaryLight
 
 //starting position, centred on ireland
 private const val START_LAT = 53.4
@@ -82,8 +81,8 @@ fun MapScreen(
     //checking the theme's background instead of the phone setting,
     //so this still works once the user can pick light/dark in settings
     val darkMap = MaterialTheme.colorScheme.background.luminance() < 0.5f
-    //coral from the theme for the pin so it stands out against the map
-    val pinColor = MaterialTheme.colorScheme.tertiary.toArgb()
+    //same red-coral pin in light and dark mode, the dark theme's lighter coral looked orange on the dark map
+    val pinColor = CoralTertiaryLight.toArgb()
     //reading this here so the map gets updated whenever the selected point changes
     val selectedPoint = viewModel.selectedPoint
     //every saved pin from the database, the markers get redrawn whenever this list changes
