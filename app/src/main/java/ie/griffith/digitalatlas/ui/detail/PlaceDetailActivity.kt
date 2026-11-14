@@ -1,5 +1,6 @@
 package ie.griffith.digitalatlas.ui.detail
 
+import android.R.attr.country
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -28,6 +29,7 @@ class PlaceDetailActivity : ComponentActivity() {
             finish()
             return
         }
+        val country = intent.getStringExtra(EXTRA_COUNTRY).orEmpty()
         val subtitle = intent.getStringExtra(EXTRA_SUBTITLE).orEmpty()
         val latitude = intent.getDoubleExtra(EXTRA_LAT, 0.0)
         val longitude = intent.getDoubleExtra(EXTRA_LON, 0.0)
@@ -39,6 +41,7 @@ class PlaceDetailActivity : ComponentActivity() {
                 PlaceDetailScreen(
                     name = name,
                     subtitle = subtitle,
+                    country = country,
                     latitude = latitude,
                     longitude = longitude,
                     wikiTitle = wikiTitle,
@@ -96,6 +99,8 @@ class PlaceDetailActivity : ComponentActivity() {
         private const val EXTRA_SUBTITLE = "ie.griffith.digitalatlas.extra.SUBTITLE"
         private const val EXTRA_LAT = "ie.griffith.digitalatlas.extra.LAT"
         private const val EXTRA_LON = "ie.griffith.digitalatlas.extra.LON"
+        //needed so the place can be saved properly if it's pinned from this page
+        private const val EXTRA_COUNTRY = "ie.griffith.digitalatlas.extra.COUNTRY"
         //used by the facts tab to load the right wikipedia article
         private const val EXTRA_WIKI_TITLE = "ie.griffith.digitalatlas.extra.WIKI_TITLE"
 
@@ -108,6 +113,7 @@ class PlaceDetailActivity : ComponentActivity() {
                 putExtra(EXTRA_LAT, place.latitude)
                 putExtra(EXTRA_LON, place.longitude)
                 putExtra(EXTRA_WIKI_TITLE, place.wikipediaTitle)
+                putExtra(EXTRA_COUNTRY, place.country)
             }
     }
 }

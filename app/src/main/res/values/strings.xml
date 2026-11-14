@@ -88,4 +88,9 @@
     <string name="remove">Remove</string>
     <string name="remove_pin_title">Remove %1$s?</string>
     <string name="remove_pin_message">It will be taken off your pinned places and the map, along with its note.</string>
+
+
+    <!--pin button on the details page-->
+    <string name="pin_place_cd">Pin this place</string>
+    <string name="unpin_place_cd">Unpin this place</string>
 </resources>

@@ -34,7 +34,6 @@ import ie.griffith.digitalatlas.ui.map.MapScreen
 import ie.griffith.digitalatlas.ui.pinned.PinnedScreen
 import ie.griffith.digitalatlas.data.model.Place
 import ie.griffith.digitalatlas.ui.map.MapViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 
 //keeping both tabs in one enum so the bottom bar and navhost read from the same list
 //filled icon when selected and outlined when not, so the current tab is obvious

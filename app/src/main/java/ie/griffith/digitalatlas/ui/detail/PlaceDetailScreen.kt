@@ -1,5 +1,6 @@
 package ie.griffith.digitalatlas.ui.detail
 
+import android.R.attr.country
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -44,6 +45,11 @@ import androidx.compose.material.icons.outlined.Directions
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.foundation.layout.height
+import androidx.compose.material.icons.filled.PushPin
+import androidx.compose.material.icons.outlined.PushPin
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.runtime.remember
+import ie.griffith.digitalatlas.data.model.Place
 
 //Header, "Open in Maps", the 3 tabs with
 //the three tabs from the proposal
@@ -56,6 +62,7 @@ private enum class DetailTab(@StringRes val labelRes: Int) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaceDetailScreen(
+    country: String,
     name: String,
     subtitle: String,
     latitude: Double,
@@ -69,10 +76,25 @@ fun PlaceDetailScreen(
     onOpenWikipedia: (String) -> Unit,
     viewModel: PlaceDetailViewModel = viewModel()
 ) {
-    //loading the facts once when the screen opens, falling back to the place name if osm had no article
+    //loading the facts once when the screen opens (falling back to the place name if osm had no article),
+    //and watching the database so the pin button knows whether this place is saved
     LaunchedEffect(Unit) {
         viewModel.loadFacts(wikiTitle ?: name)
+        viewModel.watchPin(latitude, longitude)
     }
+    //the place as one object, so it can be saved when the pin button is pressed
+    val place = remember {
+        Place(
+            name = name,
+            subtitle = subtitle,
+            country = country,
+            latitude = latitude,
+            longitude = longitude,
+            population = null,
+            wikipediaTitle = wikiTitle
+        )
+    }
+    val isPinned = viewModel.pin != null
 
     val tabs = DetailTab.entries
     //pager state is shared by the tab row and the pager so swiping and tapping stay in sync
@@ -96,6 +118,17 @@ fun PlaceDetailScreen(
                     }
                 },
                 actions = {
+                    //pin button, filled teal when the place is saved, outlined when it isn't
+                    IconButton(onClick = { viewModel.togglePin(place) }) {
+                        Icon(
+                            imageVector = if (isPinned) Icons.Filled.PushPin else Icons.Outlined.PushPin,
+                            contentDescription = stringResource(
+                                if (isPinned) R.string.unpin_place_cd else R.string.pin_place_cd
+                            ),
+                            tint = if (isPinned) MaterialTheme.colorScheme.primary else LocalContentColor.current
+                        )
+                    }
+
                     IconButton(onClick = onShare) {
                         Icon(
                             imageVector = Icons.Outlined.Share,
