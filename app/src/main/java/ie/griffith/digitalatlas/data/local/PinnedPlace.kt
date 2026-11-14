@@ -3,6 +3,7 @@ package ie.griffith.digitalatlas.data.local
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import ie.griffith.digitalatlas.data.model.Place
 
 //one row in the pinned_places table.
 //the unique index on latitude + longitude stops the same place being pinned twice
@@ -24,4 +25,17 @@ data class PinnedPlace(
     val note: String = "",
     //saved as milliseconds since 1970, a plain number works on every android version
     val pinnedAt: Long = System.currentTimeMillis()
+)
+
+
+//turning a saved pin back into a Place, so the preview card and details page can show it
+//without looking it up online again
+fun PinnedPlace.toPlace() = Place(
+    name = name,
+    subtitle = subtitle,
+    country = country,
+    latitude = latitude,
+    longitude = longitude,
+    population = null,
+    wikipediaTitle = wikipediaTitle
 )

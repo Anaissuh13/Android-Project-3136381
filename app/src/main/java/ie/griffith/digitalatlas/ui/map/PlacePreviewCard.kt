@@ -13,12 +13,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.outlined.CloudOff
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.Waves
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -34,12 +36,16 @@ import androidx.compose.ui.unit.dp
 import ie.griffith.digitalatlas.R
 import ie.griffith.digitalatlas.data.model.Place
 import java.text.NumberFormat
+import androidx.compose.material.icons.filled.PushPin
+import androidx.compose.material3.FilledTonalButton
 
 //the card that slides up from the bottom of the map after tapping somewhere,
 //one composable handles every lookup state so the card stays in the same spot
 @Composable
 fun PlacePreviewCard(
     state: PlaceLookupState,
+    //whether the place on the card is already saved, changes the pin button
+    isPinned: Boolean,
     onSeeDetails: (Place) -> Unit,
     onPinClick: (Place) -> Unit,
     onRetry: () -> Unit,
@@ -56,7 +62,7 @@ fun PlacePreviewCard(
             Column(modifier = Modifier.padding(20.dp)) {
                 when (state) {
                     PlaceLookupState.Loading -> LoadingContent()
-                    is PlaceLookupState.Found -> FoundContent(state.place, onSeeDetails, onPinClick)
+                    is PlaceLookupState.Found -> FoundContent(state.place, isPinned, onSeeDetails, onPinClick)
                     PlaceLookupState.NothingHere -> MessageContent(
                         icon = Icons.Outlined.Waves,
                         title = stringResource(R.string.nothing_here_title),
@@ -93,6 +99,7 @@ private fun LoadingContent() {
 @Composable
 private fun FoundContent(
     place: Place,
+    isPinned: Boolean,
     onSeeDetails: (Place) -> Unit,
     onPinClick: (Place) -> Unit
 ) {
@@ -129,14 +136,27 @@ private fun FoundContent(
         Button(onClick = { onSeeDetails(place) }, modifier = Modifier.weight(1f)) {
             Text(text = stringResource(R.string.see_details))
         }
-        OutlinedButton(onClick = { onPinClick(place) }) {
-            Icon(
-                imageVector = Icons.Outlined.PushPin,
-                contentDescription = null,
-                modifier = Modifier.size(18.dp)
-            )
-            Spacer(modifier = Modifier.width(6.dp))
-            Text(text = stringResource(R.string.pin))
+        //filled tonal "pinned" when it's saved, outlined "pin" when it isn't, tapping either toggles it
+        if (isPinned) {
+            FilledTonalButton(onClick = { onPinClick(place) }) {
+                Icon(
+                    imageVector = Icons.Filled.PushPin,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(text = stringResource(R.string.pinned))
+            }
+        } else {
+            OutlinedButton(onClick = { onPinClick(place) }) {
+                Icon(
+                    imageVector = Icons.Outlined.PushPin,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(text = stringResource(R.string.pin))
+            }
         }
     }
 }

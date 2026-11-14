@@ -29,7 +29,6 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.CopyrightOverlay
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -41,8 +40,9 @@ import androidx.compose.ui.Alignment
 import ie.griffith.digitalatlas.R
 import ie.griffith.digitalatlas.data.model.Place
 import android.graphics.ColorMatrixColorFilter
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.osmdroid.views.CustomZoomButtonsDisplay
-import org.osmdroid.views.overlay.TilesOverlay
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 //starting position, centred on ireland
 private const val START_LAT = 53.4
@@ -67,7 +67,7 @@ private val DarkMapFilter = ColorMatrixColorFilter(
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
-    //"see details" on the card, MainActivity will open PlaceDetailActivity from this in the next step
+    //"see details" on the card, MainActivity opens PlaceDetailActivity from this
     onSeeDetails: (Place) -> Unit = {},
     viewModel: MapViewModel = viewModel()
 ) {
@@ -86,6 +86,10 @@ fun MapScreen(
     val pinColor = MaterialTheme.colorScheme.tertiary.toArgb()
     //reading this here so the map gets updated whenever the selected point changes
     val selectedPoint = viewModel.selectedPoint
+    //every saved pin from the database, the markers get redrawn whenever this list changes
+    val pins by viewModel.pins.collectAsStateWithLifecycle()
+    //teal for saved pins so they look different from the coral pin of the place being looked at
+    val savedPinColor = MaterialTheme.colorScheme.primary.toArgb()
 
     //creating the mapview once and remembering it, otherwise every recomposition would build a new map
     val mapView = remember {
@@ -166,6 +170,16 @@ fun MapScreen(
             density = context.resources.displayMetrics.density
         )
     }
+    //teal version of the same pin for saved places
+    val savedPinIcon = remember(savedPinColor) {
+        AtlasPinDrawable(
+            fillColor = savedPinColor,
+            dotColor = android.graphics.Color.WHITE,
+            density = context.resources.displayMetrics.density
+        )
+    }
+    //one marker per saved pin, stored by the pin's database id so each can be added or removed on its own
+    val pinMarkers = remember(mapView) { mutableMapOf<Long, Marker>() }
 
     //pausing and resuming the map with the activity so it stops loading tiles in the background
     DisposableEffect(lifecycleOwner) {
@@ -196,6 +210,32 @@ fun MapScreen(
                 map.overlayManager.tilesOverlay.setColorFilter(
                     if (darkMap) DarkMapFilter else null
                 )
+
+                //removing the markers of pins that have been deleted
+                val pinIds = pins.map { it.id }.toSet()
+                pinMarkers.keys.filter { it !in pinIds }.forEach { id ->
+                    map.overlays.remove(pinMarkers.remove(id))
+                }
+                //adding a marker for every new pin. index 1 puts it just above the tap listener,
+                //so the coral pin of the selected place is still drawn on top
+                pins.forEach { pin ->
+                    val marker = pinMarkers.getOrPut(pin.id) {
+                        Marker(map).apply {
+                            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                            infoWindow = null
+                            //read out by screen readers
+                            title = pin.name
+                            //tapping a saved pin opens its card without looking it up again
+                            setOnMarkerClickListener { _, _ ->
+                                viewModel.onPinTapped(pin.id)
+                                true
+                            }
+                        }.also { map.overlays.add(1, it) }
+                    }
+                    marker.position = GeoPoint(pin.latitude, pin.longitude)
+                    marker.icon = savedPinIcon
+                }
+
                 //showing, moving or hiding the pin depending on what's selected
                 if (selectedPoint == null) {
                     map.overlays.remove(selectionMarker)
@@ -215,13 +255,16 @@ fun MapScreen(
             enter = slideInVertically { fullHeight -> fullHeight } + fadeIn(),
             exit = slideOutVertically { fullHeight -> fullHeight } + fadeOut()
         ) {
+            //the place on the card, null while it's loading or there's nothing there
+            val shownPlace = (viewModel.lookupState as? PlaceLookupState.Found)?.place
             PlacePreviewCard(
                 state = viewModel.lookupState,
-                onSeeDetails = onSeeDetails,
-                //pinning needs the database (milestone 2), so just letting the user know for now
-                onPinClick = {
-                    Toast.makeText(context, R.string.pin_coming_soon, Toast.LENGTH_SHORT).show()
+                //checking the saved pins so the button says "pinned" for places that are already saved
+                isPinned = shownPlace != null && pins.any {
+                    it.latitude == shownPlace.latitude && it.longitude == shownPlace.longitude
                 },
+                onSeeDetails = onSeeDetails,
+                onPinClick = viewModel::togglePin,
                 onRetry = viewModel::retry,
                 onClose = viewModel::clearSelection
             )
